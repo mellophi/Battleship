@@ -1,0 +1,25 @@
+Vertical Line = 3 |
+Horizontal Line = 5 _
+
+ _____
+|     |
+|     | -> default [EMPTY]
+|_____|
+ _____
+|     |
+|  O  | -> ship present [PRESENT]
+|_____|
+ _____
+|     |
+|  X  | -> cell occupied [OCCUPIED]
+|_____|
+ _____
+|     |
+|  #  | -> ship destroyed [DESTROYED]
+|_____|
+
+*******
+*     * 
+*    *
+******* 
+0 - 9 = 32 phoneme
