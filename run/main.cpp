@@ -25,13 +25,11 @@ static void clear_screen(){
 int main()
 {	
 	Grid bottom, top;
-	while(true){
-		fmt::print("{:-^60}\n", " TOP BOARD ");
-		
-		top.draw();
+	clear_screen();
+	fmt::print("{:-^60}\n", " TOP BOARD ");
 
-		fmt::print("{:-^60}\n", "")
-		clear_screen();
-	}
+	top.states[3][4] = State::PRESENT;
+	top.draw();
+	fmt::print("{:-^60}\n", "");
 	return 0;
 }

@@ -21,7 +21,7 @@ static char get_symbol(const State &state){
 
 
 void Grid::draw(){
-    
+
     for(size_t row = 1; row <= y; ++row){   
         for(size_t col = 1; col <= x; ++col){
             for(size_t i = 0; i < top_block.size(); ++i)
@@ -51,4 +51,5 @@ void Grid::draw(){
 
         fmt::print("\n");
     }
+    fflush(stdout);
 }
