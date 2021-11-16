@@ -24,9 +24,7 @@ static void clear_screen(){
 	system("cls");
 }
 
-//The changes of init_grids() are not getting reflected in gameplay()
-
-void init_grids(Grid top, Grid bottom, Grid pc)
+void init_grids(Grid &top, Grid &bottom, Grid &pc)
 {
 	clear_screen();
 
@@ -82,7 +80,7 @@ void init_grids(Grid top, Grid bottom, Grid pc)
 	}
 }
 
-void gameplay(Grid top, Grid bottom, Grid pc)
+void gameplay(Grid &top, Grid &bottom, Grid &pc)
 {
 	auto randfn = [](){
         std::random_device dev;
@@ -166,12 +164,12 @@ void gameplay(Grid top, Grid bottom, Grid pc)
 
 		fmt::print("{: ^30}\n", " COMPUTER'S CHANCE ");
 
-		row = randfn();
-		col = randfn();
-
 		int flag = 0;
 		while(flag == 0)
 		{
+			row = randfn();
+			col = randfn();
+
 			if(row>5 || row==0)
 				continue;
 			
