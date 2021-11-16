@@ -1,6 +1,7 @@
 #include <grid.hpp>
 #include <fmt/core.h>
 #include <array>
+#include <random>
 
 static std::array<char, 5> top_block = {218, 196, 196, 196, 191};
 static std::array<char, 5> middle_block = {179, 32, 32, 32, 179};
@@ -52,4 +53,39 @@ void Grid::draw(){
         fmt::print("\n");
     }
     fflush(stdout);
+}
+
+void Grid::set_grid_random()
+{
+    auto randfn = [](){
+        std::random_device dev;
+        std::mt19937 rng(dev());
+        std::uniform_int_distribution<std::mt19937::result_type> dist5(1,5); // distribution in range [1,5]
+
+        int retval = dist5(rng);
+        return retval;
+    };
+
+	int i=1;
+	while(i<=5)
+	{
+		int row = randfn();
+		int col = randfn();
+
+		if(this->states[row][col] == State::EMPTY)
+		{
+			this->states[row][col] = State::PRESENT;
+			i++;
+		}
+	}
+}
+
+bool Grid::set_grid_manual(int row, int col)
+{
+    if(this->states[row][col] == State::EMPTY)
+    {
+        this->states[row][col] = State::PRESENT;
+        return true;
+    }
+    return false;
 }

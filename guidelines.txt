@@ -20,6 +20,6 @@ Horizontal Line = 5 _
 
 *******
 *     * 
-*    *
+*     *
 ******* 
 0 - 9 = 32 phoneme
