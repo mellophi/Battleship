@@ -3,10 +3,12 @@
 #include <utils.h>
 #include <HMM.h>
 #include <cstring>
+#include <string>
+#include <iostream>
 #include <fmt/core.h>
 #define N 5 //no of states
 #define M 32 //codebook size
-#define T 65 //frame size or observation sequence size
+#define T 25 //frame size or observation sequence size
 #define SpF 320 //samples per frame
 #define p 12
 #define TRAINING_SEQUENCES 20
@@ -30,6 +32,7 @@ static long double gamma[N+1][T+1] = {{0}};
 static long double zai[N+1][N+1][T+1] = {{{0}}};
 
 static int observation[TRAINING_SEQUENCES+1][T+1] = {{0}}; 
+static int observation_recording[T+1] = {0};
 static int pi[N+1] = {0};
 static int pi_bar[N+1] = {0}; 
 static int q_star[T+1] = {0};
@@ -341,8 +344,8 @@ static void initialize_bakis(){
 		}
 
 		if(i != 5){
-			A[i][i] = 0.75;
-			A[i][i+1] = 0.25;
+			A[i][i] = 0.8;
+			A[i][i+1] = 0.2;
 		}
 
 		else
@@ -591,7 +594,7 @@ void HMM::generate_observation_sequence(const stage &choice){
 
 				utils::normalize_input(input, input_normalized);
 		
-				utils::find_stable_frames(input_normalized, stable_frames, 32);
+				utils::find_stable_frames(input_normalized, stable_frames, 12);
 
 				//for(int i=0; i<T; ++i){
 				//	for(int j=0; j<SpF; ++j){
@@ -667,7 +670,7 @@ void HMM::generate_observation_sequence(const stage &choice){
 
 				utils::normalize_input(input, input_normalized);
 		
-				utils::find_stable_frames(input_normalized, stable_frames, 32);
+				utils::find_stable_frames(input_normalized, stable_frames, 12);
 
 				//for(int i=0; i<T; ++i){
 				//	for(int j=0; j<SpF; ++j){
@@ -725,5 +728,84 @@ void HMM::generate_observation_sequence(const stage &choice){
 		}
 		fmt::print("\n");
 	}
+	else if(choice == stage::RECORD){
+		char buffer[1024];
+		sprintf(buffer, "%s/data/input/input.txt", utils::project_root);
+		FILE* input = fopen(buffer, "r");
+		FILE* input_normalized = fopen("normalized_input.txt", "w+");
+		double stable_frames[T+1][SpF], r[T+1][p+1] = {{0}}, a[T+1][p+1] = {{0}}, c[T+1][p+1] = {{0}};
+
+		utils::normalize_input(input, input_normalized);
+		utils::find_stable_frames(input_normalized, stable_frames, 12);
+		utils::applyHamming(stable_frames);
+
+		utils::calculateR(stable_frames, r);
+
+		utils::calculateA(r, a);
+
+		utils::calculateC(r, a, c);
+
+		read_codebook();
+
+		for(int i=1; i<=T; ++i){
+			long double min_distance = DBL_MAX;
+			int min_index = -1;
+			for(int j=1; j<=M; ++j){
+				long double distance = utils::tokhura_distance(c[i], codebook[j], weight);
+				if(min_distance > distance){
+					min_distance = distance;
+					min_index = j;
+				}
+			}
+			observation_recording[i] = min_index;
+		}
+
+		fclose(input);
+		fclose(input_normalized);
+	}
+}
+
+static int test_recording(){
+	long double max_score = DBL_MIN;
+	int output_digit = -1;
+	for(int digit=0; digit<10; ++digit){
+		read_lambda(digit);
+		//Initialization
+		for(int i=1; i<=N; ++i){
+			alpha[i][1] = pi[i] * B[i][observation_recording[1]];
+		}
+
+		//Induction
+		for(int t=1; t<=T-1; ++t){
+			for(int j=1; j<=N; ++j){
+				long double sum = 0;
+				for(int i=1; i<=N; ++i){
+					sum += alpha[i][t] * A[i][j];
+				}
+				sum *= B[j][observation_recording[t+1]];
+				alpha[j][t+1] = sum;
+			}
+		}
+
+		//Termination
+		long double score = 0;
+		for(int i=1; i<=N; ++i)
+			score += alpha[i][T];
+
+		if(max_score < score) { max_score = score; output_digit = digit; }
+	}
+
+	return output_digit;
+}
+
+int HMM::perform_online_test(){
+	std::string cmd = utils::project_root + "/data/Recording_Module.exe 3 " + utils::project_root + "/data/input/input.wav " + utils::project_root + "/data/input/input.txt"; 
+
+	// std::string cmd = "Recording_Module 3 " + utils::project_root + "\\data\\input\\input.wav " + utils::project_root + "\\data\\input\\input.txt";
+	// std::cout << cmd << "\n";
+	system(cmd.c_str());
+	generate_observation_sequence(stage::RECORD);
+
+	return test_recording();
 }
 

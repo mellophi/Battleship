@@ -12,6 +12,7 @@
 enum class stage{
     TRAIN, 
     TEST,
+    RECORD,
 };
 
 namespace utils{

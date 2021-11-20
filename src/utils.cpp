@@ -8,7 +8,7 @@
 #define debug(x) printf("%s(%d): %lf", __func__, __LINE__, x);
 #define N 320
 #define p 12
-#define frame 65
+#define frame 25
 
 namespace utils{
 	std::string project_root = "";

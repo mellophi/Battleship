@@ -5,8 +5,7 @@
 #include <string>
 #include <fmt/core.h>
 #include <grid.hpp>
-#include <stdlib.h>
-#include <random>
+#include <game.hpp>
 
 static void set_project_root(){
 	char buffer[1024];
@@ -20,201 +19,55 @@ static void set_project_root(){
 
 }
 
-static void clear_screen(){
-	system("cls");
-}
 
-void init_grids(Grid &top, Grid &bottom, Grid &pc)
-{
-	clear_screen();
-
-	pc.set_grid_random();
-
-	int row=1,col=1,i=1;
-
-	fmt::print("{:=^30}\n"," SETTING YOUR BOARD ");
-
-	while(i<=5)
-	{
-		std::cout<<"Row Number is: ";
-		std::cin>>row;
-		if(row>5 || row==0)
-		{
-			std::cout<<"Invalid input.\n";
-			system("PAUSE");
-			continue;
-		}
-
-		std::cout<<"Col Number is: ";
-		std::cin>>col;
-		if(col>5 || col==0)
-		{
-			std::cout<<"Invalid input.\n";
-			system("PAUSE");
-			continue;
-		}
-
-		if(bottom.set_grid_manual(row,col) == false)
-		{
-			std::cout<<"Ship already present.\n";
-			system("PAUSE");
-			continue;
-		}
-		else
-		{
-			std::cout<<"Ship added!\n";
-			i++;
-		}
-
-		clear_screen();
-	
-		/*
-		fmt::print("{:-^30}\n", " TOP BOARD ");
-		top.draw();
-		fmt::print("{: ^30}\n", "");
-		*/
-
-		fmt::print("{:-^30}\n", " BOTTOM BOARD ");
-		bottom.draw();
-		fmt::print("{:-^30}\n", "");
-	}
-}
-
-void gameplay(Grid &top, Grid &bottom, Grid &pc)
-{
-	auto randfn = [](){
-        std::random_device dev;
-        std::mt19937 rng(dev());
-        std::uniform_int_distribution<std::mt19937::result_type> dist5(1,5); // distribution in range [1,5]
-
-        int retval = dist5(rng);
-        return retval;
-    };
-
-	bool gameover = false;
-
-	int death_count_pc = 0;
-	int death_count_user = 0;
-
-	while(!gameover)
-	{
-		clear_screen();
-
-		fmt::print("{:-^30}\n", " TOP BOARD ");
-		top.draw();
-		fmt::print("{: ^30}\n", "");
-
-		fmt::print("{:-^30}\n", " BOTTOM BOARD ");
-		bottom.draw();
-		fmt::print("{:-^30}\n", "");
-
-		int row=1,col=1;
-
-		//FOR USER
-
-		fmt::print("{: ^30}\n", " USER'S CHANCE ");
-		std::cout<<"Row Number is: ";
-		std::cin>>row;
-		if(row>5 || row==0)
-		{
-			std::cout<<"Invalid input.\n";
-			system("PAUSE");
-			continue;
-		}
-
-		std::cout<<"Col Number is: ";
-		std::cin>>col;
-		if(col>5 || col==0)
-		{
-			std::cout<<"Invalid input.\n";
-			system("PAUSE");
-			continue;
-		}
-
-		if(top.states[row][col] == State::OCCUPIED || top.states[row][col] == State::DESTROYED)
-		{
-			std::cout<<"You already accessed the square!\n";
-			system("PAUSE");
-			continue;
-		}
-
-		if(pc.states[row][col] == State::PRESENT)
-		{
-			std::cout<<"It's a hit!!\n";
-			pc.states[row][col] = State::DESTROYED;
-			top.states[row][col] = State::DESTROYED;
-			death_count_pc++;
-		}
-		else if(pc.states[row][col] == State::EMPTY)
-		{
-			std::cout<<"It's a miss :(\n";
-			pc.states[row][col] = State::OCCUPIED;
-			top.states[row][col] = State::OCCUPIED;
-		}
-
-		if(death_count_pc == 5)
-		{
-			gameover = true;
-			fmt::print("{: ^30}\n", " CONGRATULATIONS! You have won :) ");
-			system("PAUSE");
-			return;
-		}
-
-		//FOR PC
-
-		fmt::print("{: ^30}\n", " COMPUTER'S CHANCE ");
-
-		int flag = 0;
-		while(flag == 0)
-		{
-			row = randfn();
-			col = randfn();
-
-			if(row>5 || row==0)
-				continue;
-			
-			if(col>5 || col==0)
-				continue;
-
-			if(bottom.states[row][col] == State::OCCUPIED || bottom.states[row][col] == State::DESTROYED)
-				continue;
-			
-			flag = 1;
-		}
-
-		if(bottom.states[row][col] == State::PRESENT)
-		{
-			std::cout<<"The computer has hit you :(\n";
-			bottom.states[row][col] = State::DESTROYED;
-			death_count_user++;
-			system("PAUSE");
-		}
-		else if(bottom.states[row][col] == State::EMPTY)
-		{
-			std::cout<<"The computer has missed :)\n";
-			bottom.states[row][col] = State::OCCUPIED;
-			system("PAUSE");
-		}
-
-		if(death_count_user == 5)
-		{
-			gameover = true;
-			fmt::print("{: ^30}\n", " You have lost :(  Better luck next time. ");
-			system("PAUSE");
-			return;
-		}
-	}
-}
 
 int main()
 {	
+	set_project_root();
+
+	int choice;
+	float count = 0;
 	Grid top, bottom, pc;
 
-	init_grids(top, bottom, pc);
+	system("cls");
+	fmt::print("{:-^100}", " BATTLESHIP ");
+	printf("\n");
+	printf("1: To do offline testing\n2: Play the game\nEnter choice:");
+	scanf("%d", &choice);
+	switch(choice){
+		case 1:
+			HMM::generate_observation_sequence(stage::TRAIN);
 
-	fmt::print("{:-^30}\n", " LET'S BEGIN THE GAME! ");
+			printf("\n\n");
+			fmt::print("{:-^102}", " TRAINING PHASE ");
+			printf("\n");
+			for(int i=0; i<10; ++i)
+				HMM::converge(i);
 
-	gameplay(top, bottom, pc);
+			fmt::print("{:-^102}", "");
+			printf("\n\n");
+			HMM::generate_observation_sequence(stage::TEST);
 
+			printf("\n\n");
+			fmt::print("{:-^102}", " TESTING PHASE ");
+			for(int i=0; i<10; ++i){
+				HMM::read_observation_sequence(i, stage::TEST);
+				printf("Actual digit is %d\n", i);
+				count += HMM::test(i);
+			}
+			printf("Overall average is %lf%\n", count);
+			fmt::print("{:-^102}", "");
+			system("PAUSE");
+			break;
+		case 2:
+			game::init_grids(top, bottom, pc);
+
+			fmt::print("{:-^30}\n", " LET'S BEGIN THE GAME! ");
+
+			game::gameplay(top, bottom, pc);
+			break;
+		default:
+			printf("Wrong choice seleted!\n");
+	}	
 	return 0;
 }

@@ -2,8 +2,7 @@ set(SOURCES
     HMM.cpp
     utils.cpp
     grid.cpp
-    player.cpp
-    ship.cpp
+    game.cpp
 )
 
 add_library(${BATTLESHIP_LIB} STATIC ${SOURCES})

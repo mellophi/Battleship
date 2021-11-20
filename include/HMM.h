@@ -6,6 +6,7 @@ extern void generate_observation_sequence(const stage &);
 extern void converge(int);
 extern void read_observation_sequence(int, const stage &);
 extern int test(int);
+extern int perform_online_test();
 };
 
 #endif
