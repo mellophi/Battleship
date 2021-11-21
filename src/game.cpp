@@ -29,9 +29,6 @@ void game::init_grids(Grid &top, Grid &bottom, Grid &pc)
 
 	while(i<=5)
 	{
-		// std::cout<<"Row Number is: ";
-		// std::cin>>row;
-
 		std::cout << "\nSpeak the row number [1-5]\n";
 		system("PAUSE");
 		do{
@@ -52,8 +49,6 @@ void game::init_grids(Grid &top, Grid &bottom, Grid &pc)
 			continue;
 		}
 
-		// std::cout<<"Col Number is: ";
-		// std::cin>>col;
 		std::cout << "\nSpeak the column number [1-5]\n";
 		system("PAUSE");
 		do{
@@ -86,12 +81,6 @@ void game::init_grids(Grid &top, Grid &bottom, Grid &pc)
 		}
 
 		clear_screen();
-	
-		/*
-		fmt::print("{:-^30}\n", " TOP BOARD ");
-		top.draw();
-		fmt::print("{: ^30}\n", "");
-		*/
 
 		fmt::print("{:-^30}\n", " BOTTOM BOARD ");
 		bottom.draw();
@@ -151,8 +140,6 @@ void game::gameplay(Grid &top, Grid &bottom, Grid &pc)
 			continue;
 		}
 
-		// std::cout<<"Col Number is: ";
-		// std::cin>>col;
 		std::cout << "\nSpeak the column number\n";
 		system("PAUSE");
 		do{
