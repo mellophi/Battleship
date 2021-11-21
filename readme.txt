@@ -15,4 +15,6 @@ INSTRUCTIONS TO BUILD AND RUN THE SOURCE
     $cd run
 8. Run run.exe to get play the game.
 
-N.B - Make sure there is no " " (blank space) in the path where the project is saved.
+N.B - 
+1. Make sure there is no " " (blank space) in the path where the project is saved.
+2. If you change the directory of the project: To run the project, delete the build folder, and repeat steps 3 to 8.
