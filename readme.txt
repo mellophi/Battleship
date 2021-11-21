@@ -1,5 +1,5 @@
 ========================================
-INSTRUCTIONS TO RUN AND BUILD THE SOURCE 
+INSTRUCTIONS TO BUILD AND RUN THE SOURCE 
 ========================================
 1. Make sure you have the updated version if build tools for vs2022.
 2. Open the Visual Studio Console for vs2022 and cd to root path of the folder.
